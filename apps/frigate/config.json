@@ -1,0 +1,26 @@
+{
+  "name": "Frigate
+  "id": "frigate
+  "available": true,
+  "short_desc": "Frigate - NVR With Realtime Object Detection for IP Cameras",
+  "author": "Chandra",
+  "port": 5000
+  "categories": [
+    "Security"
+  ],
+  "description": "Frigate - NVR With Realtime Object Detection for IP Cameras",
+  "tipi_version": 2,
+  "version": "v0.16.1",
+  "source": "https://github.com/blakeblackshear/frigate",
+  "exposable": true,
+  "supported_architectures": [
+    "arm64",
+    "amd64",
+	"docker",
+	"podman"
+  ],
+  "created_at": 1745082405284,
+  "updated_at": 1745674974072,
+  "dynamic_config": true,
+  "form_fields": []
+}

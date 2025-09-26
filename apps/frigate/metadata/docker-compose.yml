@@ -1,0 +1,64 @@
+{
+  "services": [
+    {
+      "name": "frigate",
+      "image": "ghcr.io/blakeblackshear/frigate:stable",
+      "environment": {
+        "FRIGATE_RTSP_PASSWORD": "password"
+      },
+      "internalPort": 8971,
+      "addPorts": [
+        {
+          "containerPort": 8554,
+          "hostPort": 8554,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 8555,
+          "hostPort": 8555,
+          "tcp": true,
+          "udp": false
+        },
+        {
+          "containerPort": 8555,
+          "hostPort": 8555,
+          "tcp": false,
+          "udp": true
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "/etc/localtime",
+          "containerPath": "/etc/localtime",
+          "readOnly": true,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": ""${APP_DATA_DIR}/data/frigate/config",
+          "containerPath": "/config",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/frigate/media",
+          "containerPath": "/media/frigate",
+          "readOnly": false,
+          "shared": false,
+          "private": false
+        }
+      ],
+      "stopGracePeriod": "30s",
+      "devices": [
+        "/dev/bus/usb:/dev/bus/usb",
+        "/dev/apex_0:/dev/apex_0",
+        "/dev/video11:/dev/video11",
+        "/dev/dri/renderD128:/dev/dri/renderD128"
+      ],
+      "privileged": true,
+      "shmSize": "512mb"
+    }
+  ]
+}
