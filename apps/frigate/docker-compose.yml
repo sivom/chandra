@@ -1,64 +1,29 @@
-{
-  "services": [
-    {
-      "name": "frigate",
-      "image": "ghcr.io/blakeblackshear/frigate:stable",
-      "environment": {
-        "FRIGATE_RTSP_PASSWORD": "password"
-      },
-      "internalPort": 8971,
-      "addPorts": [
-        {
-          "containerPort": 8554,
-          "hostPort": 8554,
-          "tcp": true,
-          "udp": false
-        },
-        {
-          "containerPort": 8555,
-          "hostPort": 8555,
-          "tcp": true,
-          "udp": false
-        },
-        {
-          "containerPort": 8555,
-          "hostPort": 8555,
-          "tcp": false,
-          "udp": true
-        }
-      ],
-      "volumes": [
-        {
-          "hostPath": "/etc/localtime",
-          "containerPath": "/etc/localtime",
-          "readOnly": true,
-          "shared": false,
-          "private": false
-        },
-        {
-          "hostPath": "${APP_DATA_DIR}/data/frigate/config",
-          "containerPath": "/config",
-          "readOnly": false,
-          "shared": false,
-          "private": false
-        },
-        {
-          "hostPath": "${APP_DATA_DIR}/data/frigate/media",
-          "containerPath": "/media/frigate",
-          "readOnly": false,
-          "shared": false,
-          "private": false
-        }
-      ],
-      "stopGracePeriod": "30s",
-      "devices": [
-        "/dev/bus/usb:/dev/bus/usb",
-        "/dev/apex_0:/dev/apex_0",
-        "/dev/video11:/dev/video11",
-        "/dev/dri/renderD128:/dev/dri/renderD128"
-      ],
-      "privileged": true,
-      "shmSize": "512mb"
-    }
-  ]
-}
+services:
+  frigate:
+    container_name: frigate
+    privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    stop_grace_period: 30s # allow enough time to shut down the various services
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "512mb" # update for your cameras based on calculation above
+    devices:
+      - /dev/bus/usb:/dev/bus/usb # Passes the USB Coral, needs to be modified for other versions
+      - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
+      - /dev/video11:/dev/video11 # For Raspberry Pi 4B
+      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${APP_DATA_DIR}/data/frigate/config:/config
+      - ${APP_DATA_DIR}/data/frigate/media:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8971:8971"
+      # - "5000:5000" # Internal unauthenticated access. Expose carefully.
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+    environment:
+      FRIGATE_RTSP_PASSWORD: "password"
